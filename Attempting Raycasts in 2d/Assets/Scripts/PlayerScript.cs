@@ -8,6 +8,7 @@ public class PlayerScript : MonoBehaviour
     public float range = 100f;
     public Rigidbody2D rb;
     public LayerMask hitLayerMask;
+    public int moveSpeed;
 
     private bool _doShootRight;
 
@@ -34,6 +35,16 @@ public class PlayerScript : MonoBehaviour
         if (_doShootRight)
         {
             Debug.DrawRay(start.transform.position, start.transform.TransformDirection(Vector2.right) * 100f, Color.red);
+        }
+
+        if (Input.GetKey(KeyCode.D)) 
+        {
+            transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
+        }
+
+        if (Input.GetKey(KeyCode.A))
+        {
+            transform.Translate(Vector3.left * moveSpeed * Time.deltaTime);
         }
     }
 
