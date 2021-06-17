@@ -1,16 +1,19 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.SceneManagement;
 
 public class PlayerScript : MonoBehaviour
 {
-    public GameObject start;
+    public GameObject rightStart;
+    public GameObject leftStart;
     public float range = 100f;
     public Rigidbody2D rb;
     public LayerMask hitLayerMask;
     public int moveSpeed;
 
     private bool _doShootRight;
+    private bool _doShootLeft;
 
     // Start is called before the first frame update
     void Start()
@@ -29,12 +32,18 @@ public class PlayerScript : MonoBehaviour
         // APK: Never check for input in FixedUpdate.
         // Use GetKey instead of GetKeyDown to for holding the key down.
         _doShootRight = Input.GetKey(KeyCode.RightArrow);
+        _doShootLeft = Input.GetKey(KeyCode.LeftArrow);
 
         // APK: Render ray as long as key is down.
         // Can only see this in the Game view if Gizmos are turned on.
         if (_doShootRight)
         {
-            Debug.DrawRay(start.transform.position, start.transform.TransformDirection(Vector2.right) * 100f, Color.red);
+            Debug.DrawRay(rightStart.transform.position, rightStart.transform.TransformDirection(Vector2.right) * 100f, Color.red);
+        }
+
+        if (_doShootLeft)
+        {
+            Debug.DrawRay(leftStart.transform.position, leftStart.transform.TransformDirection(Vector2.left) * 100f, Color.red);
         }
 
         if (Input.GetKey(KeyCode.D)) 
@@ -58,12 +67,17 @@ public class PlayerScript : MonoBehaviour
         {
             ShootRight();
         }
+
+        if (_doShootLeft)
+        {
+            ShootLeft();
+        }
     }
 
     void ShootRight()
     {
-        RaycastHit2D hit = Physics2D.Raycast(start.transform.position,
-            start.transform.TransformDirection(Vector2.right),
+        RaycastHit2D hit = Physics2D.Raycast(rightStart.transform.position,
+            rightStart.transform.TransformDirection(Vector2.right),
             100f,
             hitLayerMask); // APK: only objects in these layers count as hit.
 
@@ -83,5 +97,40 @@ public class PlayerScript : MonoBehaviour
         }
 
     }
+
+    void ShootLeft()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(leftStart.transform.position,
+            leftStart.transform.TransformDirection(Vector2.left),
+            100f,
+            hitLayerMask); // APK: only objects in these layers count as hit.
+
+        /*
+            APK
+
+            1. Create Player layer and assign to Player parent/child objects.
+            2. Create a Platform layer and assign to Platform parent/child objects.
+            3. Edit this scripts hitLayerMask var in the Editor. You can select one or more layers.
+
+        */
+
+
+        if (hit)
+        {
+            Debug.Log($"Ray hit: {hit.collider.name}");
+        }
+
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        //if the player collides with an Obstacle, then the whole scene resets
+        if (collision.gameObject.tag == "Obstacle")
+        {
+
+            SceneManager.LoadScene("SampleScene");
+        }
+    }
+
 }
 
